@@ -1,0 +1,5 @@
+manim>=0.19
+numpy
+scipy
+mpmath
+numba

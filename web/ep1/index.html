@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Random Matrices</title>
+<meta name="description" content="Random matrix theory, part 1: interactive companion. Gaussian ensembles and beta, level repulsion, the joint eigenvalue density, the Coulomb gas, and a step-by-step physical derivation of Wigner's semicircle, with live simulations.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+        onload="renderMathInElement(document.body,{delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]})"></script>
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<main>
+<p class="hint"><a href="../">Random Matrices</a> · Part 1</p>
+<h1>Random Matrices: Order from Noise</h1>
+<p class="lede">Random matrix theory is a happy marriage between probability and linear algebra. Fill a large
+symmetric matrix with random numbers: its eigenvalues are anything but random. They repel each other, they behave
+like a gas of electric charges, and they pile up into a perfect semicircle. And the same statistics appear in
+heavy nuclei, chaotic billiards and the zeros of the Riemann zeta function.</p>
+<video class="video" controls preload="metadata" playsinline poster="poster.jpg"><source src="ep01_1080p.mp4" type="video/mp4">Your browser does not support HTML5 video.</video>
+<nav class="toc"><a href="#s1">1 · What is it?</a><a href="#s2">2 · Gaussian ensembles</a><a href="#s3">3 · Level repulsion</a>
+<a href="#s4">4 · Coulomb gas</a><a href="#s5">5 · The semicircle</a><a href="#s6">6 · Any β</a><a href="#s7">7 · Our computations</a></nav>
+
+<!-- ============================================================ 1 -->
+<h2 id="s1"><span class="num">1</span>What is a random matrix?</h2>
+<p>A real symmetric $N\times N$ matrix $H$ ($H_{ij}=H_{ji}$) has $N$ real eigenvalues $\lambda_1\le\dots\le\lambda_N$,
+the numbers for which $Hv=\lambda v$ has a non-zero solution $v$: its <em>spectrum</em>. Draw the entries at random
+and the eigenvalues become random variables, strongly correlated with each other. Random matrix theory asks:
+<b>where</b> do they lie (their density), and <b>how far apart</b> are neighbours (their spacings)?</p>
+<div class="widget">
+  <div class="two"><canvas id="mat"></canvas><canvas id="spec"></canvas></div>
+  <div class="controls">
+    <label>size $N$ <select id="mN"><option>10</option><option>50</option><option selected>200</option><option>500</option><option>800</option></select></label>
+    <label>entries <select id="mlaw"><option value="gauss">Gaussian</option><option value="coin">coin flips ±1</option><option value="uniform">uniform</option></select></label>
+    <label><input type="checkbox" id="msemi" checked> semicircle</label>
+    <button id="mgo">New matrix</button>
+  </div>
+  <p class="hint">Left: the matrix as an image (gold positive, blue negative). Right: the histogram of its eigenvalues.
+  Increase $N$ to watch the histogram converge; change the law of the entries to see that the limit does not care.</p>
+</div>
+<p><b>Where it shows up.</b></p>
+<ul>
+<li><b>1928, John Wishart</b>: statistics; the sample covariance matrix of a data table.</li>
+<li><b>1950s, Eugene Wigner</b>: energy levels of heavy nuclei (uranium, thorium). Too complex to compute one by one,
+so replace the Hamiltonian by a random symmetric matrix and predict the <em>statistics</em> of the levels; the spacings
+of measured neutron resonances agree.</li>
+<li><b>1962, Freeman Dyson</b>: the three symmetry classes ($\beta=1,2,4$) and the Coulomb-gas picture.</li>
+<li><b>1972, Hugh Montgomery &amp; Dyson</b>: the zeros of the Riemann zeta function have the pair statistics of
+complex Hermitian random matrices; checked by Andrew Odlyzko on billions of zeros.</li>
+<li><b>1984, Bohigas, Giannoni, Schmit</b>: a quantum system whose classical motion is chaotic has random-matrix
+level statistics; a regular (integrable) one has independent levels.</li>
+<li>Disordered metals, wave chaos in optics and acoustics, wireless channels, finance, neural networks…</li>
+</ul>
+
+<!-- ============================================================ 2 -->
+<h2 id="s2"><span class="num">2</span>Which random matrix? The Gaussian ensembles</h2>
+<p>Two natural wishes. <b style="color:var(--diag)">Independent entries</b>: each entry is drawn on its own (easy to
+simulate). <b style="color:var(--gue)">Rotation invariance</b>: no basis is preferred, $P(OHO^{\mathsf T})=P(H)$ for
+every rotation $O$ (in physics, the basis in which we write a Hamiltonian is arbitrary).</p>
+<div class="widget">
+<svg viewBox="0 0 640 300" width="100%" role="img" aria-label="Two overlapping bubbles: independent entries and rotation invariance; their overlap is the Gaussian ensembles">
+  <circle cx="250" cy="150" r="120" fill="#3F7FC8" fill-opacity="0.16" stroke="#3F7FC8" stroke-width="2.5"/>
+  <circle cx="390" cy="150" r="120" fill="#E85D75" fill-opacity="0.16" stroke="#E85D75" stroke-width="2.5"/>
+  <text x="190" y="140" text-anchor="middle" fill="#5DA9E9" font-size="17" font-weight="600">Independent</text>
+  <text x="190" y="161" text-anchor="middle" fill="#5DA9E9" font-size="17" font-weight="600">entries</text>
+  <text x="190" y="186" text-anchor="middle" fill="#E6E6E6" font-size="12">coins, uniform, …</text>
+  <text x="450" y="140" text-anchor="middle" fill="#E85D75" font-size="17" font-weight="600">Rotation</text>
+  <text x="450" y="161" text-anchor="middle" fill="#E85D75" font-size="17" font-weight="600">invariant</text>
+  <text x="450" y="186" text-anchor="middle" fill="#E6E6E6" font-size="12">P(OHOᵀ) = P(H)</text>
+  <text x="320" y="145" text-anchor="middle" fill="#E6E6E6" font-size="14" font-weight="600">Gaussian</text>
+  <text x="320" y="163" text-anchor="middle" fill="#E6E6E6" font-size="14" font-weight="600">ensembles</text>
+  <text x="320" y="292" text-anchor="middle" fill="#7A8291" font-size="12">Porter–Rosenzweig (1960): the overlap contains only the Gaussian ensembles</text>
+</svg>
+</div>
+<p><b>Why only Gaussian? (the $2\times2$ case, à la Maxwell)</b></p>
+<div class="step"><b class="n">1.</b> $H=\begin{pmatrix}a&b\\b&d\end{pmatrix}$: three random numbers.</div>
+<div class="step"><b class="n">2.</b> Independence: $P(H)=f(a)\,g(b)\,f(d)$ (the same $f$ for both diagonal entries, since swapping the two
+basis vectors is a rotation).</div>
+<div class="step"><b class="n">3.</b> Invariance: $P$ depends only on the eigenvalues, i.e. on $\mathrm{Tr}\,H=a+d$ and
+$\mathrm{Tr}\,H^2=a^2+d^2+2b^2$ (these two numbers fix both eigenvalues).</div>
+<div class="step"><b class="n">4.</b> Taking logs: $\ln f(a)+\ln g(b)+\ln f(d)=\phi(a+d,\ a^2+d^2+2b^2)$. Varying $b$ alone changes only
+$\mathrm{Tr}H^2$, through $2b^2$; so $\partial_2\phi=\frac{(\ln g)'(b)}{4b}$ depends on $b$ only, yet is a function of
+$(\mathrm{Tr}H,\mathrm{Tr}H^2)$ which can be changed independently of $b$: it is a constant $-c$.</div>
+<div class="step"><b class="n">5.</b> Then $\ln f(a)+\ln f(d)=-c(a^2+d^2)+\psi(a+d)$, which forces $\psi$ to be linear. Hence
+$P(H)\propto e^{-c\,\mathrm{Tr}H^2+k\,\mathrm{Tr}H}$: Gaussian entries (shift $H$ to remove $k$).</div>
+<p>This is James Clerk Maxwell's 1860 argument for gas velocities: independent components + no preferred direction
+⟹ Gaussian.</p>
+<div class="widget">
+  <div class="two">
+    <div><p class="mono" id="rot-out"></p></div>
+    <canvas id="rot"></canvas>
+  </div>
+  <div class="controls">
+    <label>$a$ <input type="range" id="ra" min="-2" max="2" step="0.01" value="1.2"></label>
+    <label>$b$ <input type="range" id="rb" min="-2" max="2" step="0.01" value="0.5"></label>
+    <label>$d$ <input type="range" id="rd" min="-2" max="2" step="0.01" value="-0.4"></label>
+    <label>rotation $\theta$ <input type="range" id="rt" min="0" max="3.1416" step="0.01" value="0"></label>
+  </div>
+  <p class="hint">Rotate the basis: the entries of $OHO^{\mathsf T}$ change, but the eigenvalues, $\mathrm{Tr}H$ and
+  $\mathrm{Tr}H^2$ do not. A rotation-invariant law can only depend on these.</p>
+</div>
+<p><b>Three flavours, $\beta=1,2,4$.</b> Depending on the symmetries of the physical system, the matrix is real symmetric
+(time-reversal symmetry: <b style="color:var(--goe)">GOE</b>, $\beta=1$), complex Hermitian (broken time reversal, e.g.
+a magnetic field: <b style="color:var(--gue)">GUE</b>, $\beta=2$) or quaternion self-dual (time reversal with
+half-integer spin: <b style="color:var(--gse)">GSE</b>, $\beta=4$). $\beta$ is the number of real parameters in each
+off-diagonal entry. All three:
+$$P(H)\;\propto\;\exp\Big(-\frac{\beta N}{4}\,\mathrm{Tr}\,H^2\Big),$$
+the factor $N$ keeping the spectrum in $[-2,2]$.</p>
+
+<!-- ============================================================ 3 -->
+<h2 id="s3"><span class="num">3</span>Level repulsion and universality</h2>
+<div class="widget">
+  <canvas id="strips"></canvas>
+  <div class="controls"><button id="sgo">Resample</button></div>
+  <p class="hint">Top: 60 independent uniform points. Bottom: 60 consecutive eigenvalues of a $400\times400$ GOE matrix,
+  unfolded to the same mean spacing. Independent points clump; eigenvalues repel.</p>
+</div>
+<p><b>Independent points.</b> If points are thrown independently with density 1, the probability that a gap exceeds $s$
+is the probability that an interval of length $s$ is empty, $e^{-s}$; the gap density is $P(s)=e^{-s}$, largest at $s=0$.</p>
+<p><b>Eigenvalues, the $2\times2$ proof.</b> Solving the quadratic equation,
+$$\lambda_\pm=\frac{a+d}{2}\pm\frac12\sqrt{(a-d)^2+(2b)^2},\qquad s=\lambda_+-\lambda_-=\sqrt{(a-d)^2+(2b)^2}.$$
+The spacing is the distance to the origin of the point $(a-d,\,2b)$. For GOE this point is an isotropic Gaussian
+cloud, so the probability of a spacing $s$ is (length of the ring of radius $s$) × (Gaussian weight):
+$$P(s)\propto 2\pi s\,e^{-s^2/4}\quad\xrightarrow{\ \text{mean }1\ }\quad P_{\rm GOE}(s)=\frac{\pi s}{2}\,e^{-\pi s^2/4}\qquad\text{(Wigner surmise)}.$$
+A small spacing needs <em>two</em> coincidences ($a=d$ and $b=0$). For $\beta=2$, $b$ is complex: the point lives in
+3D, the ring becomes a sphere of area $4\pi s^2$, and $P(s)\propto s^2e^{-cs^2}$; for $\beta=4$, $s^4$. In general
+$P(s)\propto s^\beta$ near 0.</p>
+<div class="widget">
+  <div class="two"><canvas id="ring"></canvas><canvas id="ringh"></canvas></div>
+  <div class="controls">
+    <span class="seg" id="ring-seg"><button data-b="1" class="on">β = 1 (ring)</button><button data-b="2">β = 2 (sphere)</button></span>
+    <label>ring radius $s$ <input type="range" id="rr" min="0.05" max="4" step="0.01" value="1.5"><output id="rr-o"></output></label>
+    <button id="radd">Add 2000 matrices</button>
+  </div>
+  <p class="hint">Each dot is one random $2\times2$ matrix, placed at $(a-d,\,2b)$ (for β = 2 we show the projection of a 3D
+  cloud). The fraction of matrices inside the ring is the probability of that spacing; the histogram of distances
+  builds the Wigner surmise.</p>
+</div>
+<p><b>Large matrices and universality.</b> The surmise comes from $2\times2$ matrices, yet it describes the bulk spacings
+of large matrices to about 1 %. And it does not depend on the law of the entries (coin flips work just as well),
+only on the symmetry class $\beta$.</p>
+<div class="widget">
+  <canvas id="sp"></canvas>
+  <div class="controls">
+    <label>entries <select id="splaw"><option value="gauss">Gaussian</option><option value="coin">coin flips ±1</option><option value="uniform">uniform</option></select></label>
+    <button id="spgo">Add 5 matrices 400×400</button><span class="readout" id="sp-read"></span>
+  </div>
+</div>
+
+<!-- ============================================================ 4 -->
+<h2 id="s4"><span class="num">4</span>The joint density and the Coulomb gas</h2>
+<p>Write $H=O\Lambda O^{\mathsf T}$ (eigenvalues $\Lambda$, rotation $O$) and change variables from the entries to
+$(\lambda_1,\dots,\lambda_N,O)$. The Gaussian weight only involves $\mathrm{Tr}H^2=\sum_i\lambda_i^2$. The Jacobian is the
+ring again: for $2\times2$, $(a-d,\,2b)=(s\cos2\theta,\ s\sin2\theta)$ are polar coordinates with radius
+$s=\lambda_1-\lambda_2$, so $da\,db\,dd\propto|\lambda_1-\lambda_2|\,d\lambda_1d\lambda_2d\theta$. For $N$ eigenvalues every
+pair contributes:
+$$P(\lambda_1,\dots,\lambda_N)\;\propto\;\prod_{i<j}|\lambda_i-\lambda_j|^{\beta}\;\exp\Big(-\frac{\beta N}{4}\sum_i\lambda_i^2\Big)=e^{-\beta E},$$
+$$E=\frac N4\sum_i\lambda_i^2-\sum_{i<j}\ln|\lambda_i-\lambda_j| .$$
+<b>Reading (Dyson):</b> $N$ charges on a line, held by a harmonic spring, repelling through $-\ln r$, the electrostatic
+energy in a two-dimensional world (force $\propto1/r$), at temperature $1/\beta$.</p>
+<div class="widget">
+  <canvas id="gas"></canvas>
+  <canvas id="gash"></canvas>
+  <div class="controls">
+    <label>charges $N$ <input type="range" id="gN" min="5" max="150" step="1" value="60"><output id="gN-o"></output></label>
+    <label>$\beta$ <input type="range" id="gb" min="-1.3" max="2" step="0.01" value="0.3"><output id="gb-o"></output></label>
+    <button id="gfreeze">Freeze (β → ∞)</button><button id="greset">Scatter</button>
+  </div>
+  <p class="hint">Live Langevin dynamics of the Coulomb gas: $d\lambda_i=\big(-\tfrac{\lambda_i}{2}+\tfrac1N\sum_{j\ne i}\tfrac{1}{\lambda_i-\lambda_j}\big)dt+\sqrt{\tfrac{2}{\beta N}}\,dB_i$.
+  Its stationary law is exactly the joint density above. The histogram is averaged over time. Freeze it: the charges stop
+  at the zeros of the Hermite polynomial $H_N$ (Stieltjes, 1885).</p>
+</div>
+
+<!-- ============================================================ 5 -->
+<h2 id="s5"><span class="num">5</span>The semicircle, step by step</h2>
+<p>We derive Wigner's law $\rho(x)=\frac1{2\pi}\sqrt{4-x^2}$ from the Coulomb gas, with three tools:
+a principal value, the Sokhotski–Plemelj formula (Gauss's law) and Liouville's theorem.</p>
+<div class="step"><b class="n">Step 1 · Continuum limit.</b> Describe the charges by a density $\rho(x)$ with $\int\rho=1$:
+$\sum_i f(\lambda_i)\to N\int f\rho$ and $\sum_{i<j}\to\frac{N^2}{2}\iint$. Then
+$$E\simeq N^2\,S[\rho],\qquad S[\rho]=\int\frac{x^2}{4}\rho(x)\,dx-\frac12\iint\ln|x-y|\,\rho(x)\rho(y)\,dx\,dy .$$
+Both terms are of order $N^2$; since the weight is $e^{-\beta N^2S}$, any density with a larger $S$ is exponentially
+suppressed. For large $N$, at any temperature, the gas sits at the minimum of $S$.</div>
+<div class="step"><b class="n">Step 2 · Force balance.</b> A charge at $x$ feels the spring $-x/2$ and the push of all the others.
+At equilibrium, for every $x$ in the support,
+$$\frac x2=\mathrm{P}\!\!\int\frac{\rho(y)}{x-y}\,dy .$$
+<span class="tool"><b>Tool 1 · principal value.</b> $\mathrm{P}\!\int$ removes a small symmetric window around $y=x$ and lets
+it shrink: a charge does not push itself.</span> (Equivalently: $\frac{\delta S}{\delta\rho}=\frac{x^2}{4}-\int\ln|x-y|\rho(y)dy$
+is constant on the support, the condition of a conductor in equilibrium; differentiate in $x$.)</div>
+<div class="step"><b class="n">Step 3 · The field in the complex plane.</b> For $z=x+iy$ off the line define
+$$G(z)=\int\frac{\rho(y)}{z-y}\,dy .$$
+In two dimensions the field of a unit charge at $y$ is $\frac{z-y}{|z-y|^2}=\overline{\big(\tfrac{1}{z-y}\big)}$: the
+electric field is $\overline{G(z)}$. $G$ is complex-differentiable off the support and $G(z)\approx 1/z$ far away.</div>
+<div class="step"><b class="n">Step 4 · Crossing the wire.</b>
+<span class="tool"><b>Tool 2 · Sokhotski–Plemelj.</b> $\displaystyle\frac{1}{x-y\pm i0}=\mathrm{P}\frac{1}{x-y}\mp i\pi\,\delta(x-y)$, hence
+$$G(x\pm i0)=\mathrm{P}\!\!\int\frac{\rho(y)}{x-y}dy\;\mp\;i\pi\rho(x).$$</span>
+Physically: the horizontal field is continuous across the wire (it is the force of Step 2), the vertical field jumps by
+$2\pi\rho(x)$ (Gauss's law: the flux out of a small box equals the charge inside).</div>
+<div class="step"><b class="n">Step 5 · The trick.</b> Adding the two sides and using Step 2: $G(x+i0)+G(x-i0)=x$. Put
+$F(z)=G(z)-\frac z2$: then $F(x+i0)=-F(x-i0)$ on the support, so $F(x+i0)^2=F(x-i0)^2$: <b>$F^2$ has no jump</b>; it is
+complex-differentiable in the whole plane (its singularities at the edges are removable). Far away
+$F=-\frac z2+\frac1z+O(z^{-2})$, so $F^2=\frac{z^2}{4}-1+O(1/z)$.</div>
+<div class="step"><b class="n">Step 6 · Liouville.</b>
+<span class="tool"><b>Tool 3 · Liouville's theorem.</b> A function complex-differentiable in the whole plane and bounded is
+constant; one growing like a polynomial is a polynomial.</span>
+Applied to $F^2-\big(\frac{z^2}{4}-1\big)$, which tends to 0: it is identically 0. So $F=-\frac12\sqrt{z^2-4}$ (branch
+$\approx -z/2$ at infinity) and
+$$G(z)=\frac{z-\sqrt{z^2-4}}{2},\qquad \rho(x)=-\frac1\pi\,\mathrm{Im}\,G(x+i0)=\frac{1}{2\pi}\sqrt{4-x^2}\ \ (|x|\le2),$$
+and $\rho=0$ for $|x|>2$, where the root is real. The support $[-2,2]$ is an output, not an input.</div>
+<div class="widget">
+  <canvas id="field"></canvas>
+  <div class="readout" id="field-read">Move the pointer over the plane.</div>
+  <p class="hint">The field $\overline{G(z)}$ of the semicircle charge (gold) on the wire. Hover near the wire: just above,
+  $G=\frac x2-i\pi\rho(x)$; just below, $G=\frac x2+i\pi\rho(x)$. The horizontal part equals $x/2$ (force balance), the
+  vertical part flips and its jump is $2\pi\rho$.</p>
+</div>
+
+<!-- ============================================================ 6 -->
+<h2 id="s6"><span class="num">6</span>Any β: from a Poisson gas to a crystal</h2>
+<p>The Coulomb gas makes sense for any $\beta>0$. Dumitriu and Edelman (2002) found a matrix model for all of them: the
+symmetric tridiagonal matrix with diagonal $\mathcal N(0,2)$ and off-diagonal $\chi_{\beta(N-1)},\chi_{\beta(N-2)},\dots,\chi_\beta$
+(all divided by $\sqrt2$) has exactly the joint density $\prod|\lambda_i-\lambda_j|^\beta e^{-\sum\lambda_i^2/2}$. Only
+$O(N)$ numbers: large $N$ in the browser.</p>
+<div class="widget">
+  <div class="two"><canvas id="bh"></canvas><canvas id="bs"></canvas></div>
+  <canvas id="bstrip"></canvas>
+  <div class="controls">
+    <label>$\beta$ <input type="range" id="bb" min="-2" max="2" step="0.01" value="0"><output id="bb-o"></output></label>
+    <label>$N$ <select id="bN"><option>500</option><option selected>2000</option><option>5000</option></select></label>
+    <button id="bgo">Resample</button>
+  </div>
+  <p class="hint">Left: eigenvalue density (always a semicircle). Right: bulk spacings with the reference curves
+  (Poisson, GOE, GUE, GSE). Bottom: 50 consecutive unfolded eigenvalues. Small β: almost independent; large β: a crystal.</p>
+</div>
+
+<!-- ============================================================ 7 -->
+<h2 id="s7"><span class="num">7</span>Our computations</h2>
+<h3>Quantum billiards: regular vs chaotic</h3>
+<p>700 eigenvalues of the Laplacian (a vibrating membrane) in a quarter circle (exact Bessel zeros) and a quarter
+stadium (5-point finite differences), Dirichlet boundary, unfolded with Weyl's law. The circle (integrable) gives
+independent levels, the stadium (chaotic) gives GOE repulsion: the Bohigas–Giannoni–Schmit conjecture.</p>
+<div class="widget"><div class="two"><canvas id="bc"></canvas><canvas id="bst"></canvas></div></div>
+<h3>Anderson transition: metal or insulator</h3>
+<p>Electron on a $14^3$ cubic lattice, hopping 1, random site energies in $[-W/2,W/2]$; spacings at the band centre,
+8 disorder realisations per $W$. The statistics slide from GOE (metal, extended states) to Poisson (insulator,
+localised states) around $W_c\approx16.5$.</p>
+<div class="widget"><canvas id="and"></canvas>
+  <div class="controls"><label>disorder $W$ <input type="range" id="aW" min="0" max="8" step="1" value="0"><output id="aW-o"></output></label></div></div>
+<h3>Zeros of the Riemann zeta function</h3>
+<p>The first 10 000 non-trivial zeros $\frac12+it_n$ (computed with <code>mpmath</code>), unfolded with
+$N(t)=\frac{t}{2\pi}\ln\frac{t}{2\pi e}+\frac78$. Their spacings follow GUE ($\beta=2$).</p>
+<div class="widget"><canvas id="zeta"></canvas><div class="readout" id="zeta-read"></div></div>
+<h3>A very rare event: all eigenvalues positive</h3>
+<p>For GOE, $P(\lambda_{\min}>0)\approx e^{-\theta N^2}$ with $\theta=\frac{\ln3}{4}\approx0.2747$ (Dean and Majumdar,
+2006). The "rigged coin" of <a href="https://romainmorleghem.github.io/rare-events/ep1/">Rare Events</a> (sample
+$H+cI$ and re-weight by $e^{-\frac N4(2c\,\mathrm{Tr}H-Nc^2)}$) works up to $N\approx6$, then the weights explode. A
+"moving wall" (Metropolis simulation of the Coulomb gas, pushing a hard wall from $-2.6$ to $0$ in $\approx0.4N^2$ steps
+and multiplying the conditional probabilities) reaches $N=30$. Why $N^2$: squeezing the whole gas costs an energy of
+order $N^2$.</p>
+<div class="widget"><canvas id="ld"></canvas><div class="readout" id="ld-read"></div></div>
+
+<h2>Numbers in the video</h2>
+<div class="tablewrap"><table id="facts"></table></div>
+<p class="hint">All computed in <code>ep01_rmt/compute/</code>. Source:
+<a href="https://github.com/romainmorleghem/rmt">github.com/romainmorleghem/rmt</a>.
+Further reading: Livan, Novaes, Vivo, <em>Introduction to Random Matrices</em> (2018, arXiv:1712.07903);
+Potters &amp; Bouchaud, <em>A First Course in Random Matrix Theory</em> (2020).</p>
+</main>
+<script type="module" src="ep1.js"></script>
+</body>
+</html>
