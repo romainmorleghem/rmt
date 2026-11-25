@@ -1,0 +1,14 @@
+{
+ "P(s < 0.25): Poisson / GOE / GUE (theory)": "0.221 / 0.048 / 0.016",
+ "GOE 800×800, bulk spacings: P(s < 0.25)": "0.052",
+ "coin-flip entries 800×800: P(s < 0.25)": "0.051",
+ "quantum circle billiard (700 levels): P(s < 0.25)": "0.181",
+ "quantum stadium billiard (700 levels): P(s < 0.25)": "0.065",
+ "stadium grid points": "41975",
+ "Anderson 14³, W = 2 / 16.5 / 50: P(s < 0.25)": "0.053 / 0.064 / 0.216",
+ "zeta zeros computed": "10000 (t up to 9877.8)",
+ "zeta spacings: P(s < 0.25)": "0.010",
+ "P(all eigenvalues > 0), N = 30 (moving wall)": "e^{-262.0} ≈ 10^{-114}",
+ "fitted θ (exact ln3/4 = 0.2747)": "0.285",
+ "rigged coin breaks down at N ≈": "6 (relative error > 25 %)"
+}

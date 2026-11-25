@@ -35,7 +35,7 @@ def stadium_path(n=26, a=1.0, r=1.0):
                 t = (sgn * r - p[1]) / v[1]
                 q = p + t * v
                 if abs(q[0]) <= a and 1e-9 < t < best:
-                    best, nrm = t, np.array([0, -sgn])
+                    best, nrm = t, np.array([0.0, -sgn])
         for cx in (a, -a):                                   # caps
             c = p - np.array([cx, 0])
             B, C = c @ v, c @ c - r * r
@@ -44,9 +44,11 @@ def stadium_path(n=26, a=1.0, r=1.0):
                 t = -B + np.sqrt(disc)
                 q = p + t * v
                 if (q[0] - cx) * np.sign(cx) >= 0 and 1e-9 < t < best:
-                    best, nrm = t, -(q - np.array([cx, 0])) / r
+                    nq = q - np.array([cx, 0])
+                    best, nrm = t, -nq / np.linalg.norm(nq)
         p = p + best * v
         v = v - 2 * (v @ nrm) * nrm
+        v /= np.linalg.norm(v)
         pts.append(p.copy())
     return np.array(pts)
 
@@ -83,8 +85,8 @@ class Computations(Narrated):
         h2 = hist(a2, BI["stadium"]["s"], 28, 0, 3.5, GOE, 0.5)
         self.play(FadeOut(VGroup(cpath, spath)), VGroup(circ, lc).animate.shift(0.3 * UP),
                   VGroup(stad, ls).animate.shift(0.3 * UP), run_time=0.5)
-        self.say(r"Spacing histograms: the circle gives independent levels ($e^{-s}$); the stadium gives level "
-                 r"repulsion, the GOE curve. Chaos makes the spectrum look like a random matrix.",
+        self.say(r"Spacings: the circle gives independent levels ($e^{-s}$), the stadium gives level "
+                 r"repulsion (GOE). Chaos makes a spectrum look random-matrix.",
                  anims=[Create(a1), Create(a2), FadeIn(h1), FadeIn(h2), Create(refs(a1)), Create(refs(a2))],
                  run_time=2, extra=0.5)
         self.say(r"This is the Bohigas--Giannoni--Schmit conjecture, seen on our own data.", extra=0.3)
