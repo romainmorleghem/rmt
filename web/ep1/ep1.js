@@ -214,9 +214,12 @@ fP.onresize = drawField; drawField();
 const bH = new Plot($("bh"), { x: [-2.6, 2.6], y: [0, 0.6], aspect: 0.7 });
 const bS = new Plot($("bs"), { x: [0, 3.5], y: [0, 1.6], aspect: 0.7 });
 const bStrip = new Plot($("bstrip"), { x: [0, 50], y: [0, 1], aspect: 0.08, margin: [4, 10, 4, 10] });
+let bLam = null;
+function sampleBeta() { bLam = R.betaEnsemble(+$("bN").value, 10 ** +$("bb").value, rand); drawBeta(); }
 function drawBeta() {
-  const beta = 10 ** +$("bb").value, N = +$("bN").value; $("bb-o").textContent = beta.toPrecision(3);
-  const lam = R.betaEnsemble(N, beta, rand), s = R.unfold(lam);
+  if (!bLam) return;
+  const beta = 10 ** +$("bb").value, lam = bLam, N = lam.length, s = R.unfold(lam);
+  $("bb-o").textContent = beta.toPrecision(3);
   bH.clear(); bH.axes({ xl: "eigenvalue", yt: 0, xt: 4 }); drawHist(bH, histogram(lam, -2.4, 2.4, 48), C.eig); bH.line(semiPts(), C.semi, 2.5);
   bS.clear(); bS.axes({ xl: "spacing s", xt: 7, yt: 2 }); drawHist(bS, histogram(s, 0, 3.5, 35), C.eig);
   [[0, C.poi], [1, C.goe], [2, C.gue], [4, C.gse]].forEach(([b, c]) => bS.line(lin(0, 3.5, 200).map(x => [x, R.surmise(x, b)]), c, 1.6, 0.9));
@@ -224,8 +227,8 @@ function drawBeta() {
   bStrip.line([[0, 0.5], [50, 0.5]], C.muted, 1);
   for (let i = k; i < N; i++) { const u = N * R.semiCdf(lam[i]) - u0; if (u > 50) break; bStrip.dot(u, 0.5, C.eig, 3.5); }
 }
-["bb", "bN"].forEach(id => $(id).oninput = drawBeta); $("bgo").onclick = drawBeta;
-bH.onresize = drawBeta; drawBeta();
+["bb", "bN"].forEach(id => $(id).oninput = sampleBeta); $("bgo").onclick = sampleBeta;
+bH.onresize = bS.onresize = bStrip.onresize = drawBeta; sampleBeta();
 
 // ------------------------------------------------------------------ 7. our computations
 fetch("../data/ep1.json").then(r => r.json()).then(D => {

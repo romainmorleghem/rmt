@@ -41,6 +41,7 @@ export class Plot {
     c.font = "italic 13px Georgia, serif"; c.fillStyle = C.fg;
     if (xl) { c.textAlign = "right"; c.textBaseline = "bottom"; c.fillText(xl, this.W - this.m[1], this.H - this.m[2] - 3); }
     if (yl) { c.textAlign = "left"; c.textBaseline = "top"; c.fillText(yl, this.m[3] + 6, this.m[0]); }
+    c.textAlign = "left"; c.textBaseline = "alphabetic"; c.font = "12px system-ui, sans-serif";
   }
   clip(draw) { const c = this.ctx; c.save(); c.beginPath(); c.rect(this.m[3], this.m[0], this.iw, this.ih); c.clip(); draw(); c.restore(); }
   line(pts, color, width = 1.5, alpha = 1, dash = null) {
