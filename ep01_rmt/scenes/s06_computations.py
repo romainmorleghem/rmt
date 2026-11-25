@@ -76,7 +76,7 @@ class Computations(Narrated):
                  r"regular; in a stadium, it is chaotic.", anims=[Create(circ), Create(stad), FadeIn(lc), FadeIn(ls)],
                  run_time=1.2, extra=0.2)
         self.play(Create(cpath), Create(spath), run_time=4, rate_func=linear)
-        self.say(r"Now make it quantum: the allowed energies are the vibration frequencies of a drum of that shape. "
+        self.say(r"Now make it quantum: the allowed energies are given by the vibration modes of a drum of that shape. "
                  r"We computed the first 700 of each (circle: exactly; stadium: on a grid of %d points)."
                  % BI["stadium"]["grid_points"], extra=0.3)
         a1 = spacing_axes([-3.6, -1.3, 0], 5.0, 2.3)
@@ -146,7 +146,7 @@ class Computations(Narrated):
                      Tex(r"Poisson", font_size=24, color=POI)).arrange(DOWN, aligned_edge=LEFT, buff=0.06
                                                                        ).move_to(ax.c2p(2.9, 0.75))
         self.say(r"Their spacings (rescaled to mean 1) follow the GUE curve, the one of complex Hermitian matrices. "
-                 r"Nobody knows why: if a matrix had the zeros as eigenvalues, the Riemann hypothesis would follow.",
+                 r"Nobody knows why: if a Hermitian operator had the zeros as eigenvalues, the Riemann hypothesis would follow.",
                  anims=[Create(ax), FadeIn(hz), Create(rz), FadeIn(leg)], run_time=2, extra=0.6)
         self.play(FadeOut(VGroup(zf, strip, ax, hz, rz, leg)), run_time=0.6)
 

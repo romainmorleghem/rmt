@@ -196,9 +196,6 @@ class Semicircle(Narrated):
             (r"\Rightarrow\quad F(x+i0)^2 = F(x-i0)^2", SEMI,
              r"So $F^2$ does not jump at all: $F^2$ is perfectly smooth (complex-differentiable) in the whole plane, "
              r"wire included."),
-            (r"|z|\to\infty:\quad G\approx\frac1z\ \Rightarrow\ F^2=\frac{z^2}{4}-1+(\text{terms}\to0)", FG,
-             r"Far away, all the charge looks like a single unit charge at the origin: $G\approx 1/z$. "
-             r"Expanding, $F^2 = z^2/4 - 1$ plus terms that vanish at infinity."),
         ]
         col = VGroup()
         for i, (t, c, cap) in enumerate(steps_):
@@ -209,6 +206,24 @@ class Semicircle(Narrated):
                 m.move_to([-0.3, 2.3, 0])
             col.add(m)
             self.say(cap, anims=[Write(m)], run_time=1.2, extra=0.3)
+        self.play(FadeOut(col[0]), FadeOut(col[1]), col[2].animate.move_to([-0.3, 2.45, 0]), run_time=0.8)
+        far = [
+            (r"|z|\to\infty:\quad G(z)=\int\frac{\rho(y)}{z-y}dy=\frac{1}{z}\underbrace{\int\rho}_{=1}"
+             r"+\frac{1}{z^2}\int y\rho+\dots", FG,
+             r"Far away, expand $\frac{1}{z-y}=\frac1z\big(1+\frac yz+\dots\big)$. The leading term is the total "
+             r"charge, $\int\rho=1$: seen from afar, the wire is a single unit charge, $G\approx 1/z$."),
+            (r"F^2=\Big(-\frac z2+\frac1z+\dots\Big)^2=\frac{z^2}{4}\;\underbrace{-\,2\cdot\frac z2\cdot\frac1z}_{=\,-1}"
+             r"\;+\;O\Big(\frac1z\Big)", FG,
+             r"Now square $F=-\frac z2+\frac1z+\dots$: the $-1$ is the cross term $2\times(-\frac z2)\times\frac1z$. "
+             r"It is the total charge again. Everything else vanishes at infinity."),
+        ]
+        col2 = VGroup()
+        for t, c, cap in far:
+            m = MathTex(t, font_size=34, color=c)
+            m.next_to(col2[-1] if col2 else col[2], DOWN, buff=0.35).align_to(col[2], LEFT)
+            col2.add(m)
+            self.say(cap, anims=[Write(m)], run_time=1.4, extra=0.5)
+        col = VGroup(col[2], col2)
         self.tool(3, r"Liouville's theorem")
         lv = MathTex(r"F(z)^2=\frac{z^2}{4}-1\ \text{exactly}", font_size=38, color=SEMI).next_to(col, DOWN, buff=0.3
                                                                                                  ).align_to(col, LEFT)
@@ -222,13 +237,17 @@ class Semicircle(Narrated):
         r3b = boxed(r3, SEMI).next_to(r2, DOWN, buff=0.4)
         self.say(r"So $F=-\frac12\sqrt{z^2-4}$ (the sign that matches $-z/2$ far away), and the field is known "
                  r"everywhere.", anims=[Write(r1)], run_time=1.5, extra=0.3)
-        self.say(r"On the wire, for $|x|<2$, the square root of a negative number is imaginary\ldots",
+        self.say(r"On the wire, for $|x|<2$, $x^2-4$ is negative: its square root is purely imaginary, "
+                 r"$\sqrt{x^2-4}=i\sqrt{4-x^2}$\ldots",
                  anims=[Write(r2)], run_time=1.2, extra=0.2)
         self.say(r"\ldots and the imaginary part, the vertical field, gives the density: the semicircle!",
                  anims=[FadeIn(r3b, shift=0.2 * UP)], run_time=1.2, extra=0.4)
-        self.say(r"For $|x|>2$ the square root is real: no charge there. The edges $\pm2$ were never assumed: "
-                 r"they came out of the calculation.", extra=0.5)
-        self.play(FadeOut(VGroup(r1, r2)), r3b.animate.scale(0.8).to_corner(UL, buff=0.45).shift(0.5 * DOWN),
+        r4 = MathTex(r"|x|>2:\ \ x^2-4>0\ \Rightarrow\ \sqrt{x^2-4}\in\mathbb R\ \Rightarrow\ \mathrm{Im}\,G=0"
+                     r"\ \Rightarrow\ \rho(x)=0", font_size=34, color=FG).next_to(r3b, DOWN, buff=0.35)
+        self.say(r"For $|x|>2$, $x^2-4$ is positive: the root is real, $G$ is real, no vertical field, no charge. "
+                 r"The edges $\pm2$ were never assumed: they came out of the calculation.", anims=[Write(r4)],
+                 run_time=1.2, extra=0.5)
+        self.play(FadeOut(VGroup(r1, r2, r4)), r3b.animate.scale(0.8).to_corner(UL, buff=0.45).shift(0.5 * DOWN),
                   run_time=0.8)
         # --- L. back to the data
         ax = Axes(x_range=[-2.5, 2.5, 1], y_range=[0, 0.5, 0.1], x_length=10, y_length=3.8, axis_config=axis_cfg(),

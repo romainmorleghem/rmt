@@ -158,8 +158,8 @@ $(\lambda_1,\dots,\lambda_N,O)$. The Gaussian weight only involves $\mathrm{Tr}H
 ring again: for $2\times2$, $(a-d,\,2b)=(s\cos2\theta,\ s\sin2\theta)$ are polar coordinates with radius
 $s=\lambda_1-\lambda_2$, so $da\,db\,dd\propto|\lambda_1-\lambda_2|\,d\lambda_1d\lambda_2d\theta$. For $N$ eigenvalues every
 pair contributes:
-$$P(\lambda_1,\dots,\lambda_N)\;\propto\;\prod_{i<j}|\lambda_i-\lambda_j|^{\beta}\;\exp\Big(-\frac{\beta N}{4}\sum_i\lambda_i^2\Big)=e^{-\beta E},$$
-$$E=\frac N4\sum_i\lambda_i^2-\sum_{i<j}\ln|\lambda_i-\lambda_j| .$$
+$$P(\lambda_1,\dots,\lambda_N)\;\propto\;\prod_{i\lt j}|\lambda_i-\lambda_j|^{\beta}\;\exp\Big(-\frac{\beta N}{4}\sum_i\lambda_i^2\Big)=e^{-\beta E},$$
+$$E=\frac N4\sum_i\lambda_i^2-\sum_{i\lt j}\ln|\lambda_i-\lambda_j| .$$
 <b>Reading (Dyson):</b> $N$ charges on a line, held by a harmonic spring, repelling through $-\ln r$, the electrostatic
 energy in a two-dimensional world (force $\propto1/r$), at temperature $1/\beta$.</p>
 <div class="widget">
@@ -180,7 +180,7 @@ energy in a two-dimensional world (force $\propto1/r$), at temperature $1/\beta$
 <p>We derive Wigner's law $\rho(x)=\frac1{2\pi}\sqrt{4-x^2}$ from the Coulomb gas, with three tools:
 a principal value, the Sokhotski–Plemelj formula (Gauss's law) and Liouville's theorem.</p>
 <div class="step"><b class="n">Step 1 · Continuum limit.</b> Describe the charges by a density $\rho(x)$ with $\int\rho=1$:
-$\sum_i f(\lambda_i)\to N\int f\rho$ and $\sum_{i<j}\to\frac{N^2}{2}\iint$. Then
+$\sum_i f(\lambda_i)\to N\int f\rho$ and $\sum_{i\lt j}\to\frac{N^2}{2}\iint$. Then
 $$E\simeq N^2\,S[\rho],\qquad S[\rho]=\int\frac{x^2}{4}\rho(x)\,dx-\frac12\iint\ln|x-y|\,\rho(x)\rho(y)\,dx\,dy .$$
 Both terms are of order $N^2$; since the weight is $e^{-\beta N^2S}$, any density with a larger $S$ is exponentially
 suppressed. For large $N$, at any temperature, the gas sits at the minimum of $S$.</div>
@@ -202,14 +202,19 @@ $2\pi\rho(x)$ (Gauss's law: the flux out of a small box equals the charge inside
 <div class="step"><b class="n">Step 5 · The trick.</b> Adding the two sides and using Step 2: $G(x+i0)+G(x-i0)=x$. Put
 $F(z)=G(z)-\frac z2$: then $F(x+i0)=-F(x-i0)$ on the support, so $F(x+i0)^2=F(x-i0)^2$: <b>$F^2$ has no jump</b>; it is
 complex-differentiable in the whole plane (its singularities at the edges are removable). Far away
-$F=-\frac z2+\frac1z+O(z^{-2})$, so $F^2=\frac{z^2}{4}-1+O(1/z)$.</div>
+the whole charge looks like a single unit charge at the origin: expanding $\frac{1}{z-y}=\frac1z\big(1+\frac yz+\frac{y^2}{z^2}+\dots\big)$
+and using $\int\rho=1$ gives $G(z)=\frac1z+\frac{m_1}{z^2}+\dots$ ($m_1=\int y\rho$). Hence
+$$F=-\frac z2+\frac1z+O(z^{-2}),\qquad F^2=\frac{z^2}{4}\;\underbrace{-\,2\cdot\frac z2\cdot\frac1z}_{=\,-1}\;+\;O(1/z).$$
+The constant $-1$ is the cross term of the square: it is the total charge $\int\rho=1$.</div>
 <div class="step"><b class="n">Step 6 · Liouville.</b>
 <span class="tool"><b>Tool 3 · Liouville's theorem.</b> A function complex-differentiable in the whole plane and bounded is
 constant; one growing like a polynomial is a polynomial.</span>
 Applied to $F^2-\big(\frac{z^2}{4}-1\big)$, which tends to 0: it is identically 0. So $F=-\frac12\sqrt{z^2-4}$ (branch
 $\approx -z/2$ at infinity) and
 $$G(z)=\frac{z-\sqrt{z^2-4}}{2},\qquad \rho(x)=-\frac1\pi\,\mathrm{Im}\,G(x+i0)=\frac{1}{2\pi}\sqrt{4-x^2}\ \ (|x|\le2),$$
-and $\rho=0$ for $|x|>2$, where the root is real. The support $[-2,2]$ is an output, not an input.</div>
+For $|x|\lt 2$, $x^2-4\lt 0$: the root is purely imaginary, $\sqrt{x^2-4}=i\sqrt{4-x^2}$ (sign fixed by the branch),
+so $\mathrm{Im}\,G\neq0$ and there is charge. For $|x|\gt 2$, $x^2-4\gt 0$: the root is real, $G$ is real, $\mathrm{Im}\,G=0$,
+hence $\rho=0$. The support $[-2,2]$ is an output, not an input.</div>
 <div class="widget">
   <canvas id="field"></canvas>
   <div class="readout" id="field-read">Move the pointer over the plane.</div>
@@ -220,7 +225,7 @@ and $\rho=0$ for $|x|>2$, where the root is real. The support $[-2,2]$ is an out
 
 <!-- ============================================================ 6 -->
 <h2 id="s6"><span class="num">6</span>Any β: from a Poisson gas to a crystal</h2>
-<p>The Coulomb gas makes sense for any $\beta>0$. Dumitriu and Edelman (2002) found a matrix model for all of them: the
+<p>The Coulomb gas makes sense for any $\beta\gt 0$. Dumitriu and Edelman (2002) found a matrix model for all of them: the
 symmetric tridiagonal matrix with diagonal $\mathcal N(0,2)$ and off-diagonal $\chi_{\beta(N-1)},\chi_{\beta(N-2)},\dots,\chi_\beta$
 (all divided by $\sqrt2$) has exactly the joint density $\prod|\lambda_i-\lambda_j|^\beta e^{-\sum\lambda_i^2/2}$. Only
 $O(N)$ numbers: large $N$ in the browser.</p>
@@ -254,7 +259,7 @@ localised states) around $W_c\approx16.5$.</p>
 $N(t)=\frac{t}{2\pi}\ln\frac{t}{2\pi e}+\frac78$. Their spacings follow GUE ($\beta=2$).</p>
 <div class="widget"><canvas id="zeta"></canvas><div class="readout" id="zeta-read"></div></div>
 <h3>A very rare event: all eigenvalues positive</h3>
-<p>For GOE, $P(\lambda_{\min}>0)\approx e^{-\theta N^2}$ with $\theta=\frac{\ln3}{4}\approx0.2747$ (Dean and Majumdar,
+<p>For GOE, $P(\lambda_{\min}\gt 0)\approx e^{-\theta N^2}$ with $\theta=\frac{\ln3}{4}\approx0.2747$ (Dean and Majumdar,
 2006). The "rigged coin" of <a href="https://romainmorleghem.github.io/rare-events/ep1/">Rare Events</a> (sample
 $H+cI$ and re-weight by $e^{-\frac N4(2c\,\mathrm{Tr}H-Nc^2)}$) works up to $N\approx6$, then the weights explode. A
 "moving wall" (Metropolis simulation of the Coulomb gas, pushing a hard wall from $-2.6$ to $0$ in $\approx0.4N^2$ steps
